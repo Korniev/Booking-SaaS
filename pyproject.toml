@@ -15,6 +15,7 @@ dependencies = [
   "psycopg2-binary>=2.9.11",
   "psycopg[binary]>=3.3.2",
   "greenlet>=3.3.1",
+  "passlib[bcrypt]>=1.7.4",
 ]
 
 [project.optional-dependencies]
