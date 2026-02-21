@@ -10,6 +10,7 @@ class AuthService:
         self.hasher = hasher
 
     async def login(self, session: AsyncSession, email: str, password: str) -> str:
+        print("users_repo type:", type(self.users_repo), self.users_repo)
         user = await self.users_repo.get_by_email(session, email)
         if not user:
             raise ValueError("Invalid credentials")

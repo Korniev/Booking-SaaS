@@ -28,3 +28,8 @@ class UserRoleUpdate(BaseModel):
 
 class UserActiveUpdate(BaseModel):
     is_active: bool
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str

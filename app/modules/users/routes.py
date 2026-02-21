@@ -7,7 +7,7 @@ from app.core.dependencies import db_session
 from app.infra.db.models.user import User
 from app.modules.auth.dependencies import require_active_user, require_superuser
 from app.modules.users.dependencies import get_user_service
-from app.modules.users.schemas import UserCreate, UserRead, UserRoleUpdate, UserActiveUpdate
+from app.modules.users.schemas import UserCreate, UserRead, UserRoleUpdate, UserActiveUpdate, ChangePasswordRequest
 from app.modules.users.service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -59,3 +59,14 @@ async def set_user_active(
     _: User = Depends(require_superuser),
 ):
     return await service.set_active(session, user_id, payload.is_active)
+
+
+@router.post("/me/change-password")
+async def change_my_password(
+    payload: ChangePasswordRequest,
+    session: AsyncSession = Depends(db_session),
+    service: UserService = Depends(get_user_service),
+    user: User = Depends(require_active_user),
+):
+    await service.change_password(session, user, payload.old_password, payload.new_password)
+    return {"status": "ok"}

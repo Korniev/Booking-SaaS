@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, BadRequestError
 from app.core.security import PasswordHasher
 from app.infra.db.models.user import User
 from app.modules.users.exceptions import UserAlreadyExistsError
@@ -41,3 +41,9 @@ class UserService:
         if not user:
             raise NotFoundError("User not found")
         return user
+
+    async def change_password(self, session: AsyncSession, user: User, old_password: str, new_password: str) -> None:
+        if not self.hasher.verify(old_password, user.hashed_password):
+            raise BadRequestError("Old password is incorrect")
+        new_hash = self.hasher.hash(new_password)
+        await self.repo.set_password_hash(session, user.id, new_hash)
