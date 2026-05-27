@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     jwt_access_token_expire_minutes: int = Field(default=60, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES")
 
+    redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
+    cache_resources_ttl: int = Field(default=60, alias="CACHE_RESOURCES_TTL")
+    rate_limit_login_max: int = Field(default=5, alias="RATE_LIMIT_LOGIN_MAX")
+    rate_limit_login_window: int = Field(default=60, alias="RATE_LIMIT_LOGIN_WINDOW")
+    idempotency_ttl: int = Field(default=86400, alias="IDEMPOTENCY_TTL")
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
