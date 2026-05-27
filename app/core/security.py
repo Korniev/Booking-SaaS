@@ -32,7 +32,7 @@ def create_access_token(*, subject: str, expires_minutes: int | None = None) -> 
     exp_minutes = expires_minutes or settings.jwt_access_token_expire_minutes
     expire = now + timedelta(minutes=exp_minutes)
 
-    payload: dict[str, Any] = {"sub": subject, "iat": int(now.timestamp()), "exp": expire}
+    payload: dict[str, Any] = {"sub": subject, "iat": int(now.timestamp()), "exp": int(expire.timestamp())}
     return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 

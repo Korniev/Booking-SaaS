@@ -20,3 +20,16 @@ class UserRead(UserBase):
 
     class Config:
         from_attributes = True
+
+
+
+class UserRoleUpdate(BaseModel):
+    is_superuser: bool
+
+class UserActiveUpdate(BaseModel):
+    is_active: bool
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str

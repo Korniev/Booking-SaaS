@@ -7,6 +7,9 @@ from app.core.middleware.request_logging import RequestLoggingMiddleware
 from app.modules.health.routes import router as health_router
 from app.modules.users.routes import router as users_router
 from app.modules.auth.routes import router as auth_router
+from app.modules.tenants.routes import router as tenants_router
+from app.modules.resources.routes import router as resources_router
+from app.modules.bookings.routes import router as bookings_router
 
 configure_logging(level=settings.log_level)
 
@@ -18,6 +21,9 @@ app.add_middleware(RequestLoggingMiddleware)
 app.include_router(health_router)
 app.include_router(users_router)
 app.include_router(auth_router)
+app.include_router(tenants_router)
+app.include_router(resources_router)
+app.include_router(bookings_router)
 
 
 @app.get("/")

@@ -1,12 +1,13 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infra.db.models.user import User
 
 
 class UserRepository:
+
     async def get_by_id(self, session: AsyncSession, user_id: uuid.UUID) -> User | None:
         result = await session.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()
@@ -24,3 +25,27 @@ class UserRepository:
         await session.commit()
         await session.refresh(user)
         return user
+
+    async def set_superuser(self, session: AsyncSession, user_id: uuid.UUID, is_superuser: bool) -> User | None:
+        await session.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(is_superuser=is_superuser)
+        )
+        await session.commit()
+        return await self.get_by_id(session, user_id)
+
+    async def set_active(self, session: AsyncSession, user_id: uuid.UUID, is_active: bool) -> User | None:
+        await session.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(is_active=is_active)
+        )
+        await session.commit()
+        return await self.get_by_id(session, user_id)
+
+    async def set_password_hash(self, session: AsyncSession, user_id: uuid.UUID, hashed_password: str) -> None:
+        await session.execute(
+            update(User).where(User.id == user_id).values(hashed_password=hashed_password)
+        )
+        await session.commit()
