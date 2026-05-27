@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import db_session
@@ -13,7 +13,7 @@ from app.modules.users.service import UserService
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/register", response_model=UserRead)
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register_user(
     payload: UserCreate,
     session: AsyncSession = Depends(db_session),
@@ -61,7 +61,7 @@ async def set_user_active(
     return await service.set_active(session, user_id, payload.is_active)
 
 
-@router.post("/me/change-password")
+@router.post("/me/change-password", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def change_my_password(
     payload: ChangePasswordRequest,
     session: AsyncSession = Depends(db_session),
@@ -69,4 +69,3 @@ async def change_my_password(
     user: User = Depends(require_active_user),
 ):
     await service.change_password(session, user, payload.old_password, payload.new_password)
-    return {"status": "ok"}

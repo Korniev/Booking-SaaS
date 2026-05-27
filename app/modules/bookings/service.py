@@ -1,8 +1,10 @@
 import uuid
+from datetime import datetime, timezone
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ForbiddenError, NotFoundError
 from app.infra.db.models.booking import Booking
 from app.infra.db.models.tenant import Tenant
 from app.infra.db.models.user import User
@@ -42,12 +44,16 @@ class BookingService:
                 raise BookingOverlapError("This time slot is already booked")
             raise
 
-    async def cancel(self, session: AsyncSession, tenant: Tenant, booking_id: uuid.UUID) -> Booking:
+    async def cancel(self, session: AsyncSession, tenant: Tenant, user: User, booking_id: uuid.UUID) -> Booking:
         booking = await self.repo.get(session, booking_id, tenant.id)
         if not booking:
             raise NotFoundError("Booking not found")
 
+        if booking.user_id != user.id and not user.is_superuser:
+            raise ForbiddenError("You can only cancel your own bookings")
+
         booking.status = "cancelled"
+        booking.cancelled_at = datetime.now(timezone.utc)
         await session.commit()
         await session.refresh(booking)
         return booking

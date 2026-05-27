@@ -13,7 +13,9 @@ class ResourceRepository:
         return res.scalar_one_or_none()
 
     async def list(self, session: AsyncSession, tenant_id: uuid.UUID) -> list[Resource]:
-        res = await session.execute(select(Resource).where(Resource.tenant_id == tenant_id))
+        res = await session.execute(
+            select(Resource).where(Resource.tenant_id == tenant_id, Resource.is_active.is_(True))
+        )
         return list(res.scalars().all())
 
     async def create(self, session: AsyncSession, resource: Resource) -> Resource:

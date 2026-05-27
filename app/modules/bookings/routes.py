@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import db_session
@@ -14,7 +14,7 @@ from app.modules.tenants.dependencies import require_tenant
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 
-@router.post("", response_model=BookingRead)
+@router.post("", response_model=BookingRead, status_code=status.HTTP_201_CREATED)
 async def create_booking(
     payload: BookingCreate,
     session: AsyncSession = Depends(db_session),
@@ -30,7 +30,7 @@ async def cancel_booking(
     booking_id: uuid.UUID,
     session: AsyncSession = Depends(db_session),
     tenant: Tenant = Depends(require_tenant),
-    _: User = Depends(require_active_user),
+    user: User = Depends(require_active_user),
     service: BookingService = Depends(get_booking_service),
 ):
-    return await service.cancel(session, tenant, booking_id)
+    return await service.cancel(session, tenant, user, booking_id)

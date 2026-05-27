@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import db_session
@@ -13,7 +13,7 @@ from app.modules.tenants.dependencies import require_tenant
 router = APIRouter(prefix="/resources", tags=["resources"])
 
 
-@router.post("", response_model=ResourceRead)
+@router.post("", response_model=ResourceRead, status_code=status.HTTP_201_CREATED)
 async def create_resource(
     payload: ResourceCreate,
     session: AsyncSession = Depends(db_session),
