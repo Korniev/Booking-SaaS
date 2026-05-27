@@ -23,3 +23,7 @@ class ForbiddenError(AppError):
 
 class ConflictError(AppError):
     pass
+
+
+class TooManyRequestsError(AppError):
+    pass

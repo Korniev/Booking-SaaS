@@ -1,19 +1,30 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.core.config import settings
 from app.core.error_handlers import setup_exception_handlers
 from app.core.logging import configure_logging
 from app.core.middleware.request_logging import RequestLoggingMiddleware
-from app.modules.health.routes import router as health_router
-from app.modules.users.routes import router as users_router
+from app.infra.redis.client import close_redis, init_redis
 from app.modules.auth.routes import router as auth_router
-from app.modules.tenants.routes import router as tenants_router
-from app.modules.resources.routes import router as resources_router
 from app.modules.bookings.routes import router as bookings_router
+from app.modules.health.routes import router as health_router
+from app.modules.resources.routes import router as resources_router
+from app.modules.tenants.routes import router as tenants_router
+from app.modules.users.routes import router as users_router
 
 configure_logging(level=settings.log_level)
 
-app = FastAPI(title="Booking SaaS", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_redis(settings.redis_url)
+    yield
+    await close_redis()
+
+
+app = FastAPI(title="Booking SaaS", version="0.1.0", lifespan=lifespan)
 
 setup_exception_handlers(app)
 app.add_middleware(RequestLoggingMiddleware)

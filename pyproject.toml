@@ -20,6 +20,7 @@ dependencies = [
   "bcrypt<5",
   "python-jose[cryptography]>=3.5.0",
   "python-multipart>=0.0.22",
+  "redis[asyncio]>=5.0.0",
 ]
 
 [project.optional-dependencies]
