@@ -7,31 +7,18 @@ from redis import RedisError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.core.dependencies import db_session, get_password_hasher
+from app.core.dependencies import db_session
 from app.core.exceptions import TooManyRequestsError
-from app.core.security import PasswordHasher
 from app.infra.db.models.user import User
 from app.infra.redis.client import get_redis
-from app.modules.auth.dependencies import require_active_user
+from app.modules.auth.dependencies import get_auth_service, require_active_user
 from app.modules.auth.schemas import TokenResponse
 from app.modules.auth.service import AuthService
-from app.modules.users.repository import UserRepository
 from app.modules.users.schemas import UserRead
 
 logger = logging.getLogger("app.auth")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-def get_users_repo() -> UserRepository:
-    return UserRepository()
-
-
-def get_auth_service(
-    users_repo: UserRepository = Depends(get_users_repo),
-    hasher: PasswordHasher = Depends(get_password_hasher),
-) -> AuthService:
-    return AuthService(users_repo, hasher)
 
 
 async def check_login_rate_limit(
